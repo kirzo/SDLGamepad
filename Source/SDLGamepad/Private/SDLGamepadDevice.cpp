@@ -293,6 +293,12 @@ void FSDLGamepadDevice::OpenPad(uint32 SDLId)
 	Pad.HardwareId = UE::SDLGamepad::GetHardwareId(Gamepad);
 	Pad.DeviceId = DeviceMapper.AllocateNewInputDeviceId();
 
+	// Out-of-range values make the first frame send every axis, creating the Slate user now: a local player added before it exists never gets the viewport focus
+	for (int32& Axis : Pad.Axes)
+	{
+		Axis = MAX_int32;
+	}
+
 	// Inside the scope, listeners of the connection change can tell which hardware it is before any input
 	FInputDeviceScope InputScope(this, UE::SDLGamepad::InputClassName, static_cast<int32>(SDLId), Pad.HardwareId);
 	DeviceMapper.Internal_MapInputDeviceToUser(Pad.DeviceId, DeviceMapper.GetPlatformUserForNewlyConnectedDevice(), EInputDeviceConnectionState::Connected);
