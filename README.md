@@ -62,7 +62,7 @@ Anything SDL recognizes as a gamepad works: the controllers its own drivers hand
 
 - **Standard keys.** Face buttons, shoulders, stick clicks, Back/Start, d-pad, both sticks and both analog triggers. Face buttons are **positional**: the bottom button is `Gamepad_FaceButton_Bottom` on every pad (A on Xbox, Cross on PlayStation, B on Nintendo).
 - **Engine-compatible digital keys.** `Gamepad_LeftTrigger`, `Gamepad_LeftStick_Up` and friends are derived from the axes with XInput's thresholds, and held buttons repeat with the delays from your Input settings, just like the engine's XInput device.
-- **Hot plug.** Controllers are registered with the platform input device mapper when connected and released when unplugged, following your project's device mapping policy.
+- **Hot plug.** Controllers are registered with the platform input device mapper when connected and released when unplugged, following your project's device mapping policy. The connection is announced inside the controller's `FInputDeviceScope`, so listeners of the mapper's connection event can tell which hardware it is before any button is pressed.
 - **Rumble** through the regular force feedback API (Force Feedback Effects, Dynamic Force Feedback, `ClientPlayForceFeedback`...).
 - **Light color** through Input Device Properties (`Device Color` properties, or `FInputDeviceLightColorProperty` from C++).
 - **Player LEDs** that follow the local player each controller belongs to.

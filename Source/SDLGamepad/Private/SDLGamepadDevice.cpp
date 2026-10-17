@@ -292,6 +292,9 @@ void FSDLGamepadDevice::OpenPad(uint32 SDLId)
 	Pad.SDLId = SDLId;
 	Pad.HardwareId = UE::SDLGamepad::GetHardwareId(Gamepad);
 	Pad.DeviceId = DeviceMapper.AllocateNewInputDeviceId();
+
+	// Inside the scope, listeners of the connection change can tell which hardware it is before any input
+	FInputDeviceScope InputScope(this, UE::SDLGamepad::InputClassName, static_cast<int32>(SDLId), Pad.HardwareId);
 	DeviceMapper.Internal_MapInputDeviceToUser(Pad.DeviceId, DeviceMapper.GetPlatformUserForNewlyConnectedDevice(), EInputDeviceConnectionState::Connected);
 
 	UE_LOG(LogSDLGamepad, Log, TEXT("Connected '%hs' (%04x:%04x) as '%s', InputDeviceId %d"), SDL_GetGamepadName(Gamepad), SDL_GetGamepadVendor(Gamepad), SDL_GetGamepadProduct(Gamepad), *Pad.HardwareId, Pad.DeviceId.GetId());
