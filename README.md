@@ -22,6 +22,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Setup: Avoid Double Input](#setup-avoid-double-input)
+- [Controller Mappings](#controller-mappings)
 - [Usage](#usage)
 - [Notes and Caveats](#notes-and-caveats)
 - [Repository Layout](#repository-layout)
@@ -43,7 +44,7 @@ Why SDL: its HIDAPI drivers talk to controllers that Windows' own APIs handle po
 
 ## Supported Controllers
 
-Anything SDL recognizes as a gamepad works. Each controller reports a **hardware device identifier** through `FInputDeviceScope`, so button prompt systems can show the right icons.
+Anything SDL recognizes as a gamepad works: the controllers its own drivers handle, plus the thousands covered by the bundled [community mapping database](#controller-mappings). Each controller reports a **hardware device identifier** through `FInputDeviceScope`, so button prompt systems can show the right icons.
 
 | Controller | Hardware device id | Rumble | Light color | Player LED |
 |---|---|:---:|:---:|:---:|
@@ -106,6 +107,21 @@ SDL reads every controller, Xbox pads included. Any other gamepad backend left r
 
 ---
 
+## Controller Mappings
+
+SDL only treats a device as a gamepad when it knows which of its buttons and axes is which. On top of SDL's built-in mappings, the plugin loads a snapshot of **[SDL_GameControllerDB](https://github.com/mdqinc/SDL_GameControllerDB)** at startup, from `Resources/SDL_GameControllerDB/gamecontrollerdb.txt` (commit `c1d5289`, October 2026). To update it, replace that file with a newer one from the repository.
+
+Mappings of your own go through SDL's standard environment variables, and both take priority over the bundled database:
+
+- `SDL_GAMECONTROLLERCONFIG`: one or more mapping lines, separated by newlines.
+- `SDL_GAMECONTROLLERCONFIG_FILE`: path to a file in the same format as `gamecontrollerdb.txt`.
+
+A mapping line looks like `GUID,name,a:b0,b:b1,...,platform:Windows,`. The easiest way to create one is SDL's `testcontroller` tool or one of the mapping tools listed in the SDL_GameControllerDB README.
+
+A mapping can only rename what the device already sends correctly. A controller whose raw data is broken at the OS level (for example a Switch Pro Controller without the handshake SDL's own driver performs) needs a dedicated SDL driver, not a mapping.
+
+---
+
 ## Usage
 
 ### Input
@@ -145,6 +161,7 @@ To let the engine's **Input Device Subsystem** (and CommonUI) know which control
 ```
 SDLGamepad/
 ├── Binaries/ThirdParty/SDL3/Win64/SDL3.dll   # loaded at startup, staged with packaged builds
+├── Resources/SDL_GameControllerDB/           # community mapping database and its license
 ├── Source/
 │   ├── SDLGamepad/                           # the input device module
 │   └── ThirdParty/SDL3Library/               # SDL3 headers, import library and license
@@ -167,7 +184,7 @@ SDLGamepad is released under the **MIT No Attribution License (MIT-0)**. See [LI
 
 Use it, modify it and ship it in anything, commercial or not. No credit required.
 
-SDL3 is distributed under the **zlib License**, which does not require credit in shipped products either; see [Source/ThirdParty/SDL3Library/LICENSE.txt](Source/ThirdParty/SDL3Library/LICENSE.txt).
+SDL3 and SDL_GameControllerDB are distributed under the **zlib License**, which does not require credit in shipped products either; see [Source/ThirdParty/SDL3Library/LICENSE.txt](Source/ThirdParty/SDL3Library/LICENSE.txt) and [Resources/SDL_GameControllerDB/LICENSE](Resources/SDL_GameControllerDB/LICENSE).
 
 ---
 

@@ -17,5 +17,8 @@ public class SDLGamepad : ModuleRules
 			"Slate",
 			"SDL3Library"
 		});
+
+		// SDL reads it with its own file IO, so it has to stay a loose file
+		RuntimeDependencies.Add("$(PluginDir)/Resources/SDL_GameControllerDB/gamecontrollerdb.txt");
 	}
 }

@@ -13,7 +13,8 @@ struct SDL_Gamepad;
 class FSDLGamepadDevice : public IInputDevice
 {
 public:
-	explicit FSDLGamepadDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler);
+	/** MappingsFile: SDL_GameControllerDB-format mappings loaded on top of SDL's built-in ones. */
+	FSDLGamepadDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler, const FString& MappingsFile);
 	virtual ~FSDLGamepadDevice() override;
 
 	//~ Begin IInputDevice

@@ -95,7 +95,7 @@ namespace UE::SDLGamepad
 	}
 }
 
-FSDLGamepadDevice::FSDLGamepadDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+FSDLGamepadDevice::FSDLGamepadDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler, const FString& MappingsFile)
 	: MessageHandler(InMessageHandler)
 {
 	GConfig->GetFloat(TEXT("/Script/Engine.InputSettings"), TEXT("InitialButtonRepeatDelay"), InitialButtonRepeatDelay, GInputIni);
@@ -107,7 +107,22 @@ FSDLGamepadDevice::FSDLGamepadDevice(const TSharedRef<FGenericApplicationMessage
 
 	// Pads already plugged in arrive as SDL_EVENT_GAMEPAD_ADDED on the first poll
 	bInitialized = SDL_Init(SDL_INIT_GAMEPAD);
-	UE_CLOG(!bInitialized, LogSDLGamepad, Error, TEXT("SDL_Init failed: %hs"), SDL_GetError());
+	if (!bInitialized)
+	{
+		UE_LOG(LogSDLGamepad, Error, TEXT("SDL_Init failed: %hs"), SDL_GetError());
+		return;
+	}
+
+	// Pads that gain a mapping here also arrive as SDL_EVENT_GAMEPAD_ADDED
+	const int32 NumMappings = SDL_AddGamepadMappingsFromFile(TCHAR_TO_UTF8(*MappingsFile));
+	UE_CLOG(NumMappings < 0, LogSDLGamepad, Warning, TEXT("Could not load gamepad mappings from %s: %hs"), *MappingsFile, SDL_GetError());
+
+	// SDL loaded the user's file during init with the same priority as ours, so it goes back on top
+	const char* UserMappingsFile = SDL_GetHint(SDL_HINT_GAMECONTROLLERCONFIG_FILE);
+	if (UserMappingsFile && *UserMappingsFile)
+	{
+		SDL_AddGamepadMappingsFromFile(UserMappingsFile);
+	}
 }
 
 FSDLGamepadDevice::~FSDLGamepadDevice()
