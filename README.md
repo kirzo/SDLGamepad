@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://kirzo.dev/content/images/plugins/SDLGamepad_banner.jpg" alt="SDLGamepad Banner" width="512">
+</p>
+
 <h1 align="center">SDLGamepad</h1>
 
 <p align="center">
